@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-/// Login screen where the user authenticates with Spotify.
-/// On success, transitions to QuestionnaireOneView.
 struct LoginView: View {
     @EnvironmentObject var appState: AppState
     
     var body: some View {
         VStack(spacing: 20) {
+            Spacer()
+            
             Text("Welcome to MyMusicApp")
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -28,16 +28,15 @@ struct LoginView: View {
             }
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("LoginButton")
+            
+            Spacer()
         }
         .padding()
-        .transition(.asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity),
-                               removal: .move(edge: .top).combined(with: .opacity)))
     }
     
-    /// Simulates user authentication. In production, integrate the real Spotify Auth flow here.
     private func authenticateUser() {
+        appState.isLoggedIn = true
         withAnimation {
-            appState.isLoggedIn = true
             appState.step = .questionnaireOne
         }
     }
