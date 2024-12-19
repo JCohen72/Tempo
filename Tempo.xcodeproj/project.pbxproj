@@ -29,20 +29,42 @@
 		04B2CC212D13D9C000430739 /* TempoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TempoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		04B2CCD92D13E39400430739 /* Exceptions for "Tempo" folder in "Tempo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"8. Tests/TempoTests/TempoTests.swift",
+				"8. Tests/TempoUITests/TempoUITests.swift",
+				"8. Tests/TempoUITests/TempoUITestsLaunchTests.swift",
+			);
+			target = 04B2CC052D13D9BD00430739 /* Tempo */;
+		};
+		04B2CCDA2D13E39400430739 /* Exceptions for "Tempo" folder in "TempoTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"8. Tests/TempoTests/TempoTests.swift",
+			);
+			target = 04B2CC162D13D9C000430739 /* TempoTests */;
+		};
+		04B2CCE02D13E39700430739 /* Exceptions for "Tempo" folder in "TempoUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"8. Tests/TempoUITests/TempoUITests.swift",
+				"8. Tests/TempoUITests/TempoUITestsLaunchTests.swift",
+			);
+			target = 04B2CC202D13D9C000430739 /* TempoUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		04B2CC082D13D9BD00430739 /* Tempo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				04B2CCD92D13E39400430739 /* Exceptions for "Tempo" folder in "Tempo" target */,
+				04B2CCDA2D13E39400430739 /* Exceptions for "Tempo" folder in "TempoTests" target */,
+				04B2CCE02D13E39700430739 /* Exceptions for "Tempo" folder in "TempoUITests" target */,
+			);
 			path = Tempo;
-			sourceTree = "<group>";
-		};
-		04B2CC1A2D13D9C000430739 /* TempoTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TempoTests;
-			sourceTree = "<group>";
-		};
-		04B2CC242D13D9C000430739 /* TempoUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TempoUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -76,8 +98,6 @@
 			isa = PBXGroup;
 			children = (
 				04B2CC082D13D9BD00430739 /* Tempo */,
-				04B2CC1A2D13D9C000430739 /* TempoTests */,
-				04B2CC242D13D9C000430739 /* TempoUITests */,
 				04B2CC072D13D9BD00430739 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,9 +150,6 @@
 			dependencies = (
 				04B2CC192D13D9C000430739 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				04B2CC1A2D13D9C000430739 /* TempoTests */,
-			);
 			name = TempoTests;
 			packageProductDependencies = (
 			);
@@ -152,9 +169,6 @@
 			);
 			dependencies = (
 				04B2CC232D13D9C000430739 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				04B2CC242D13D9C000430739 /* TempoUITests */,
 			);
 			name = TempoUITests;
 			packageProductDependencies = (
