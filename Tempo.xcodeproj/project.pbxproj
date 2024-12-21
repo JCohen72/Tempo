@@ -36,6 +36,7 @@
 				"8. Tests/TempoTests/TempoTests.swift",
 				"8. Tests/TempoUITests/TempoUITests.swift",
 				"8. Tests/TempoUITests/TempoUITestsLaunchTests.swift",
+				Info.plist,
 			);
 			target = 04B2CC052D13D9BD00430739 /* Tempo */;
 		};
@@ -410,6 +411,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tempo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Tempo;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -449,6 +451,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tempo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Tempo;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

@@ -1,5 +1,5 @@
 //
-//  3. QuestionnaireTwoView.swift
+//  QuestionnaireTwoView.swift
 //  Tempo
 //
 //  Created by Joey Cohen on 12/18/24.
