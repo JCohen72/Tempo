@@ -7,37 +7,33 @@
 
 import SwiftUI
 
-/// First questionnaire screen to gather initial user preferences.
-/// Provides a "Next" button that transitions to QuestionnaireTwoView.
 struct QuestionnaireOneView: View {
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var appState: AppState
     
     var body: some View {
         VStack(spacing: 20) {
+            Spacer()
+            
             Text("Questionnaire - Step 1")
                 .font(.title)
                 .fontWeight(.semibold)
             
-            Text("Select your preferred genres or provide some details.")
-                .font(.body)
+            Text("Select your preferred genres or provide details.")
                 .multilineTextAlignment(.center)
                 .padding()
             
-            // Insert form elements or selection controls here...
+            Spacer()
             
             HStack {
                 Spacer()
                 Button("Next") {
-                    withAnimation {
-                        appState.step = .questionnaireTwo
-                    }
+                    appState.push(.questionnaireTwo)
                 }
                 .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("NextFromQ1Button")
             }
+            .padding(.horizontal)
         }
         .padding()
-        .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
-                               removal: .move(edge: .leading).combined(with: .opacity)))
+        .navigationBarBackButtonHidden(true)
     }
 }
