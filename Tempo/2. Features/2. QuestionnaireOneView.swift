@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct QuestionnaireOneView: View {
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var appState: AppState
     
     var body: some View {
         VStack(spacing: 20) {
@@ -18,8 +18,7 @@ struct QuestionnaireOneView: View {
                 .font(.title)
                 .fontWeight(.semibold)
             
-            Text("Select your preferred genres or provide some details.")
-                .font(.body)
+            Text("Select your preferred genres or provide details.")
                 .multilineTextAlignment(.center)
                 .padding()
             
@@ -28,15 +27,13 @@ struct QuestionnaireOneView: View {
             HStack {
                 Spacer()
                 Button("Next") {
-                    withAnimation {
-                        appState.step = .questionnaireTwo
-                    }
+                    appState.push(.questionnaireTwo)
                 }
                 .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("NextFromQ1Button")
             }
             .padding(.horizontal)
         }
         .padding()
+        .navigationBarBackButtonHidden(true)
     }
 }

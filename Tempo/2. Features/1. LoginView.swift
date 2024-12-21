@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var appState: AppState
     
     var body: some View {
         VStack(spacing: 20) {
@@ -35,9 +35,6 @@ struct LoginView: View {
     }
     
     private func authenticateUser() {
-        appState.isLoggedIn = true
-        withAnimation {
-            appState.step = .questionnaireOne
-        }
+        appState.push(.questionnaireOne)
     }
 }

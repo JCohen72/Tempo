@@ -15,8 +15,8 @@ struct MainView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding()
-                .accessibilityIdentifier("MainView")
             Spacer()
         }
+        .navigationBarBackButtonHidden(true)
     }
 }

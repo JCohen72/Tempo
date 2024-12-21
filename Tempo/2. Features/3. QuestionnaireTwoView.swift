@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct QuestionnaireTwoView: View {
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var appState: AppState
     
     var body: some View {
         VStack(spacing: 20) {
@@ -19,7 +19,6 @@ struct QuestionnaireTwoView: View {
                 .fontWeight(.semibold)
             
             Text("Finalize your preferences here.")
-                .font(.body)
                 .multilineTextAlignment(.center)
                 .padding()
             
@@ -27,12 +26,9 @@ struct QuestionnaireTwoView: View {
             
             HStack {
                 Button("Back") {
-                    withAnimation {
-                        appState.step = .questionnaireOne
-                    }
+                    appState.pop()
                 }
                 .buttonStyle(.bordered)
-                .accessibilityIdentifier("BackToQ1Button")
                 
                 Spacer()
                 
@@ -40,16 +36,14 @@ struct QuestionnaireTwoView: View {
                     finishOnboarding()
                 }
                 .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("DoneButtonQ2")
             }
             .padding(.horizontal)
         }
         .padding()
+        .navigationBarBackButtonHidden(true)
     }
     
     private func finishOnboarding() {
-        withAnimation {
-            appState.step = .main
-        }
+        appState.push(.main)
     }
 }

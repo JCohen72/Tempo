@@ -8,15 +8,20 @@
 import SwiftUI
 import Combine
 
-enum AppStep: Hashable {
-    case login
-    case questionnaireOne
-    case questionnaireTwo
-    case main
-}
-
 @MainActor
 final class AppState: ObservableObject {
-    @Published var step: AppStep = .login
-    @Published var isLoggedIn: Bool = false
+    @Published var navigationPath: [AppStep] = []
+
+    func push(_ step: AppStep) {
+        navigationPath.append(step)
+    }
+    
+    func pop() {
+        guard !navigationPath.isEmpty else { return }
+        navigationPath.removeLast()
+    }
+
+    func popToRoot() {
+        navigationPath.removeAll()
+    }
 }
