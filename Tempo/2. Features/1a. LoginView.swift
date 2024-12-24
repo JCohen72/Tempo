@@ -115,11 +115,12 @@ struct LoginView: View {
                 self.isLoading = false
                 return
             }
-            
+        
             // Exchange the code for tokens
             Task {
                 await self.authManager.exchangeCodeForTokens(code: code)
                 // We do NOT navigate here; we let AppFlowCoordinator respond to isLoggedIn changes
+                // Done or error by the time it returns
                 self.isLoading = false
             }
         }

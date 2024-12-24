@@ -1,0 +1,46 @@
+{
+  "functions": {
+    // Path to your Cloud Functions code
+    "source": "functions",
+
+    // List of items to ignore when uploading
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "*.local"
+    ],
+
+    // Commands to run before deploy
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run lint",
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ],
+
+    // Secret environment variables
+    "runtimeOptions": {
+      "secretEnvironmentVariables": [
+        {
+          "secret": "SPOTIFY_CLIENT_SECRET",
+          "key": "SPOTIFY_CLIENT_SECRET"
+        }
+      ]
+    },
+
+    // The endpoints configuration for each function
+    "endpoints": {
+      "generateFirebaseToken": {
+        // Region we want this function to run in (default is "us-central1")
+        "region": "us-central1",
+        
+        // If we want brand-new (not-yet-signed-in) clients to call an onCall function:
+        "allowUnauthenticated": true
+
+        // Any additional configuration for memory, concurrency, etc. go here:
+        // "availableMemoryMb": 256,
+        // "timeoutSeconds": 60
+      }
+    }
+  }
+}

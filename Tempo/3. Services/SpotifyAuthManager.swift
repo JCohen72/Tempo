@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CryptoKit
+import FirebaseAuth
 
 final class SpotifyAuthManager: ObservableObject {
     @Published var isLoggedIn: Bool = false
@@ -14,16 +15,19 @@ final class SpotifyAuthManager: ObservableObject {
     private let keyAccessToken    = "SpotifyAccessToken"
     private let keyRefreshToken   = "SpotifyRefreshToken"
     private let keyExpirationDate = "SpotifyExpirationDate"
-    private let keyCodeVerifier   = "SpotifyPKCE_verifier"
-
+    private let keyCodeVerifier   = "SpotifyPKCE_verifier"  // PKCE stored in Keychain if needed
+    
     let alertManager: AlertManager
     
+    /// PKCE code verifier stored in-memory. Retrieve from Keychain if app restarts mid-auth.
     private var codeVerifierInMemory: String = ""
     
+    // MARK: - Init
     init(alertManager: AlertManager) {
         self.alertManager = alertManager
     }
     
+    // MARK: - PKCE Helpers
     private func generateCodeVerifier() -> String {
         let length = 128
         let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -40,18 +44,25 @@ final class SpotifyAuthManager: ObservableObject {
         return base64
     }
     
+    // MARK: - Build the Spotify Authorization URL
     func makeAuthorizationURL() -> URL? {
         let newVerifier = generateCodeVerifier()
         codeVerifierInMemory = newVerifier
         
-        // Also store the verifier in Keychain, just in case the user backgrounds the app mid-flow
+        // Also store the verifier in Keychain, in case the app backgrounds mid-flow
         if let data = newVerifier.data(using: .utf8) {
-            KeychainManager.save(key: keyCodeVerifier, data: data)
+            let status = KeychainManager.save(key: keyCodeVerifier, data: data)
+            // If you want to track potential Keychain errors here:
+            if status != errSecSuccess {
+                alertManager.showAlert(
+                    title: "Keychain Error",
+                    message: "Failed saving PKCE verifier (status: \(status))"
+                )
+            }
         }
         
         let codeChallenge = generateCodeChallenge(from: newVerifier)
         var components = URLComponents(string: "https://accounts.spotify.com/authorize")
-        
         components?.queryItems = [
             .init(name: "client_id", value: SpotifyConfig.clientID),
             .init(name: "response_type", value: "code"),
@@ -64,6 +75,7 @@ final class SpotifyAuthManager: ObservableObject {
         return components?.url
     }
     
+    // MARK: - Exchange the Authorization Code for Tokens
     func exchangeCodeForTokens(code: String) async {
         // Retrieve code verifier from Keychain if needed
         let storedVerifier = loadPKCEVerifier() ?? codeVerifierInMemory
@@ -96,15 +108,35 @@ final class SpotifyAuthManager: ObservableObject {
                 return
             }
             let tokenResponse = try JSONDecoder().decode(TokenResponse.self, from: data)
+            
+            // 1) Store the Spotify tokens in Keychain
             storeTokens(from: tokenResponse)
+            
+            // 2) Attempt Firebase sign-in using the new Spotify access token
+            let spotifyAccessToken = tokenResponse.access_token
+            let firebaseSuccess = await FirebaseAuthManager.shared
+                .signInWithSpotify(spotifyAccessToken: spotifyAccessToken,
+                                   alertManager: alertManager)
+            
+            // If the Firebase sign-in fails, do NOT proceed with isLoggedIn
+            guard firebaseSuccess else {
+                alertManager.showAlert(title: "Error",
+                                       message: "Firebase failed to sign-in.")
+                return
+            }
+            
             await MainActor.run {
                 self.isLoggedIn = true
             }
         } catch {
-            alertManager.showAlert(title: "Error", message: "Exchange code error: \(error.localizedDescription)")
+            alertManager.showAlert(
+                title: "Error",
+                message: "Exchange code error: \(error.localizedDescription)"
+            )
         }
     }
     
+    // MARK: - Refresh Tokens if Needed
     @discardableResult
     func refreshIfNeeded() async -> Bool {
         guard let refreshToken = loadRefreshToken() else {
@@ -146,41 +178,98 @@ final class SpotifyAuthManager: ObservableObject {
         }
     }
     
+    // MARK: - Logout (with Keychain + Firebase sign-out)
     func logout() {
-        KeychainManager.delete(key: keyAccessToken)
-        KeychainManager.delete(key: keyRefreshToken)
-        KeychainManager.delete(key: keyCodeVerifier)
+        // 1) Remove tokens from Keychain (with error checks)
+        let atStatus = KeychainManager.delete(key: keyAccessToken)
+        if atStatus != errSecSuccess && atStatus != errSecItemNotFound {
+            alertManager.showAlert(
+                title: "Keychain Error",
+                message: "Failed removing Spotify access token (status: \(atStatus))"
+            )
+        }
+        
+        let rtStatus = KeychainManager.delete(key: keyRefreshToken)
+        if rtStatus != errSecSuccess && rtStatus != errSecItemNotFound {
+            alertManager.showAlert(
+                title: "Keychain Error",
+                message: "Failed removing Spotify refresh token (status: \(rtStatus))"
+            )
+        }
+        
+        let pkceStatus = KeychainManager.delete(key: keyCodeVerifier)
+        if pkceStatus != errSecSuccess && pkceStatus != errSecItemNotFound {
+            alertManager.showAlert(
+                title: "Keychain Error",
+                message: "Failed removing PKCE verifier (status: \(pkceStatus))"
+            )
+        }
+        
+        // 2) Remove stored expiration date
         UserDefaults.standard.removeObject(forKey: keyExpirationDate)
+        
+        // 3) Sign out of Firebase, if using
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            alertManager.showAlert(
+                title: "Error",
+                message: "Failed logging out of Firebase: \(error.localizedDescription)"
+            )
+        }
+        
+        // 4) Mark as logged out
         isLoggedIn = false
     }
     
+    // MARK: - Store Tokens with OSStatus Checks
     private func storeTokens(from resp: TokenResponse) {
+        // Save the Access Token
         if let atData = resp.access_token.data(using: .utf8) {
-            KeychainManager.save(key: keyAccessToken, data: atData)
+            let atStatus = KeychainManager.save(key: keyAccessToken, data: atData)
+            if atStatus != errSecSuccess {
+                alertManager.showAlert(
+                    title: "Keychain Error",
+                    message: "Failed saving Spotify access token (status: \(atStatus))"
+                )
+            }
         }
+        
+        // Save the Refresh Token (if present)
         if let rt = resp.refresh_token, let rtData = rt.data(using: .utf8) {
-            KeychainManager.save(key: keyRefreshToken, data: rtData)
+            let rtStatus = KeychainManager.save(key: keyRefreshToken, data: rtData)
+            if rtStatus != errSecSuccess {
+                alertManager.showAlert(
+                    title: "Keychain Error",
+                    message: "Failed saving Spotify refresh token (status: \(rtStatus))"
+                )
+            }
         }
+        
+        // Update expiration date
         let expiresSec = resp.expires_in ?? 3600
         let expDate = Date().addingTimeInterval(TimeInterval(expiresSec))
         UserDefaults.standard.set(expDate, forKey: keyExpirationDate)
     }
     
+    // MARK: - Load PKCE Verifier
     private func loadPKCEVerifier() -> String? {
         guard let data = KeychainManager.load(key: keyCodeVerifier) else { return nil }
         return String(data: data, encoding: .utf8)
     }
     
+    // MARK: - Load Refresh Token
     private func loadRefreshToken() -> String? {
         guard let data = KeychainManager.load(key: keyRefreshToken) else { return nil }
         return String(data: data, encoding: .utf8)
     }
     
+    // MARK: - Check if Token Expired
     private var isTokenExpired: Bool {
         guard let exp = UserDefaults.standard.object(forKey: keyExpirationDate) as? Date else {
             return true
         }
-        // Refresh 30s before actual expiration
+        // Refresh ~30s before actual expiration
         return Date() >= exp.addingTimeInterval(-30)
     }
     
@@ -188,6 +277,7 @@ final class SpotifyAuthManager: ObservableObject {
         return isTokenExpired
     }
     
+    // MARK: - Load Access Token for immediate calls
     func loadAccessToken() -> String? {
         guard let data = KeychainManager.load(key: keyAccessToken) else { return nil }
         return String(data: data, encoding: .utf8)
