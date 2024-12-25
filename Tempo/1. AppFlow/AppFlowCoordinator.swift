@@ -5,23 +5,15 @@
 //  Created by Joey Cohen on 12/19/24.
 //
 
-//
-//  AppFlowCoordinator.swift
-//  Tempo
-//
-//  Created by Joey Cohen on 12/19/24.
-//
-
 import SwiftUI
 
 struct AppFlowCoordinator: View {
     @EnvironmentObject private var appState: AppState
-    @EnvironmentObject private var authManager: SpotifyAuthManager
+    @EnvironmentObject private var authManager: AuthManager
     @EnvironmentObject private var alertManager: AlertManager
     
     var body: some View {
         NavigationStack(path: $appState.navigationPath) {
-            // Root view is the LoginView
             LoginView()
                 .navigationDestination(for: AppStep.self) { step in
                     switch step {
@@ -33,27 +25,36 @@ struct AppFlowCoordinator: View {
                         MainView()
                     }
                 }
-                // Perform refresh in a dedicated .task on the coordinator itself,
-                // rather than in SpotifyAuthManager's init
                 .task {
-                    // 3) Add guard to avoid doing repeated refresh attempts if needed
-                    guard !authManager.isLoggedIn else { return }
-                    
+                    // If we have partial tokens, attempt to refresh
                     let hasValidToken = await authManager.refreshIfNeeded()
                     if hasValidToken {
-                        appState.push(.questionnaireOne)
+                        // If after refresh, both Spotify + Firebase are valid:
+                        if authManager.isLoggedIn {
+                            appState.push(.questionnaireOne)
+                        }
                     } else {
+                        // If refresh not valid or fails, ensure root
                         appState.popToRoot()
                     }
                 }
-                // Listen for login changes and navigate forward
+                // Observe changes in isLoggedIn to handle re-routes
                 .onChange(of: authManager.isLoggedIn) {
                     if authManager.isLoggedIn {
-                        // We move the navigation logic from LoginView to the coordinator
-                        // This keeps LoginView "dumb" and focuses it purely on login action
+                        // Both services are now logged in => push to Q1
                         appState.push(.questionnaireOne)
+                    } else {
+                        // They got logged out => ensure we’re at root
+                        appState.popToRoot()
                     }
                 }
+        }
+        .alert(item: $alertManager.alertMessage) { alertData in
+            Alert(
+                title: Text(alertData.title),
+                message: Text(alertData.message),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }

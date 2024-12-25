@@ -1,110 +1,146 @@
 /**
  * /functions/src/index.ts
  */
-import {onCall} from "firebase-functions/v2/https";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {logger} from "firebase-functions";
 import {initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
 import fetch from "node-fetch";
 
-// 1. Initialize the Firebase Admin SDK once for the environment.
 initializeApp();
 
 /**
- * We define the shape of request.data for the callable function.
+ * Structure of data expected by generateFirebaseToken function.
  */
 interface GenerateTokenRequestData {
   spotifyAccessToken: string;
 }
 
 /**
- * This Cloud Function uses Google Secret Manager to store secrets,
- * exposed to the runtime as environment variables via
- * 'secretEnvironmentVariables'.
+ * Example structured error codes we might want to throw.
+ * See:
+ * https://firebase.google.com/docs/functions/callable-reference#function_return_types_errors_and_metadata
+ */
+enum MyErrorCode {
+  MISSING_ACCESS_TOKEN = "missing-access-token",
+  SPOTIFY_UNAUTHORIZED = "spotify-unauthorized",
+  SPOTIFY_GENERIC = "spotify-generic",
+  UNKNOWN_ERROR = "unknown-error",
+}
+
+/**
+ * Cloud Function that generates a Firebase custom token
+ * using a Spotify Access Token.
  */
 export const generateFirebaseToken = onCall<GenerateTokenRequestData>(
-  {
-    region: "us-central1", // or preferred region
-    memory: "256MiB",
-    timeoutSeconds: 60,
-    // We'll set secretEnvironmentVariables in firebase.json.
-  },
-  async (request)=>{
+  async (request) => {
     try {
-      // STEP 1: Pull the Spotify secret from environment variables.
-      // This variable is auto-injected if we set up
-      // secretEnvironmentVariables in firebase.json properly.
-      const spotifyClientSecret=process.env.SPOTIFY_CLIENT_SECRET||"";
-      if (!spotifyClientSecret) {
-        throw new Error("SPOTIFY_CLIENT_SECRET not set in env variables.");
-      }
+      /*
+       * NO LONGER NEED FOR CURRENT FLOW BUT SAVING FOR FUTURE USE
+       * STEP 0: Pull the Spotify secret from environment variables.
+       * const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET || "";
+       * if (!spotifyClientSecret) {
+       *   throw new Error("SPOTIFY_CLIENT_SECRET not set in env variables.");
+       * }
+       */
 
-      logger.info("generateFirebaseToken called", {
-        hasAuthContext: !!request.auth,
-      });
+      logger.info(
+        "generateFirebaseToken called",
+        {hasAuthContext: !!request.auth},
+      );
 
-      // STEP 2: Parse input data
-      const {spotifyAccessToken}=request.data;
+      // STEP 1: Validate the input
+      const {spotifyAccessToken} = request.data;
       if (!spotifyAccessToken) {
-        throw new Error("Missing required field: 'spotifyAccessToken'");
+        throw new HttpsError(
+          "invalid-argument",
+          "Missing required field: 'spotifyAccessToken'.",
+          {code: MyErrorCode.MISSING_ACCESS_TOKEN},
+        );
       }
 
-      // We might not need 'spotifyClientSecret' to validate the token
-      // if we only call '/v1/me' on Spotify. But if we do a server-side
-      // refresh or advanced calls, we'll use it here.
-
-      // STEP 3: Validate the Spotify Access Token with /v1/me
-      const resp=await fetch("https://api.spotify.com/v1/me", {
-        headers: {
-          Authorization: `Bearer ${spotifyAccessToken}`,
+      // STEP 2: Validate the Spotify Access Token
+      const resp = await fetch(
+        "https://api.spotify.com/v1/me",
+        {
+          headers: {
+            Authorization: `Bearer ${spotifyAccessToken}`,
+          },
         },
-      });
+      );
 
       if (!resp.ok) {
-        const body=await resp.text();
-        logger.error("Spotify /v1/me call failed", {
-          status: resp.status,
-          body,
-        });
-        // Typically 401 => invalid/expired token
-        throw new Error(`Spotify token validation failed: ${resp.status}`);
+        const body = await resp.text();
+        logger.error(
+          "Spotify /v1/me call failed",
+          {status: resp.status, body},
+        );
+
+        if (resp.status === 401) {
+          // Typically 401 => invalid/expired token
+          throw new HttpsError(
+            "unauthenticated",
+            "Spotify token is invalid or expired.",
+            {code: MyErrorCode.SPOTIFY_UNAUTHORIZED},
+          );
+        } else {
+          throw new HttpsError(
+            "failed-precondition",
+            `Spotify token validation failed: ${resp.status}`,
+            {code: MyErrorCode.SPOTIFY_GENERIC, body},
+          );
+        }
       }
 
-      const spotifyProfile=await resp.json() as {
-        id:string;
-        display_name?:string;
-        email?:string;
+      const spotifyProfile = (await resp.json()) as {
+        id: string;
+        display_name?: string;
+        email?: string;
       };
 
       if (!spotifyProfile.id) {
-        throw new Error("Spotify profile missing 'id' field.");
+        throw new HttpsError(
+          "failed-precondition",
+          "Spotify profile missing 'id' field.",
+          {code: MyErrorCode.SPOTIFY_GENERIC},
+        );
       }
 
-      const userId=spotifyProfile.id;
-      const displayName=spotifyProfile.display_name||"";
-      const email=spotifyProfile.email||"";
+      // STEP 3: Create a Firebase custom token using the Spotify user ID
+      const userId = spotifyProfile.id;
+      const displayName = spotifyProfile.display_name || "";
+      const email = spotifyProfile.email || "";
 
-      logger.info("Spotify user validated", {
+      logger.info(
+        "Spotify user validated",
+        {userId, displayName, email},
+      );
+
+      const auth = getAuth();
+      const customToken = await auth.createCustomToken(
         userId,
-        displayName,
-        email,
-      });
+        {displayName, email},
+      );
 
-      // STEP 4: Create a Firebase custom token using the Spotify user ID
-      const auth=getAuth();
-      const customToken=await auth.createCustomToken(userId, {
-        displayName,
-        email,
-      });
+      logger.info(
+        "Created Firebase custom token for Spotify user",
+        {userId},
+      );
 
-      logger.info("Created Firebase custom token for Spotify user", {userId});
-
-      // STEP 5: Return the token to the client
+      // STEP 4: Return success
       return {token: customToken};
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Error in generateFirebaseToken", {error});
-      // Throwing inside onCall returns a structured error to the client
-      throw error;
+
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+
+      throw new HttpsError(
+        "unknown",
+        (error as Error).message || "Unknown error occurred",
+        {code: MyErrorCode.UNKNOWN_ERROR},
+      );
     }
-  }
+  },
 );

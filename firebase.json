@@ -19,14 +19,14 @@
     ],
 
     // Secret environment variables
-    "runtimeOptions": {
-      "secretEnvironmentVariables": [
-        {
-          "secret": "SPOTIFY_CLIENT_SECRET",
-          "key": "SPOTIFY_CLIENT_SECRET"
-        }
-      ]
-    },
+    // "runtimeOptions": {
+      // "secretEnvironmentVariables": [
+        // {
+          // "secret": "SPOTIFY_CLIENT_SECRET",
+          // "key": "SPOTIFY_CLIENT_SECRET"
+        // }
+      // ]
+    // },
 
     // The endpoints configuration for each function
     "endpoints": {
@@ -35,11 +35,11 @@
         "region": "us-central1",
         
         // If we want brand-new (not-yet-signed-in) clients to call an onCall function:
-        "allowUnauthenticated": true
+        "allowUnauthenticated": true,
 
         // Any additional configuration for memory, concurrency, etc. go here:
-        // "availableMemoryMb": 256,
-        // "timeoutSeconds": 60
+        "availableMemoryMb": 256,
+        "timeoutSeconds": 60
       }
     }
   }

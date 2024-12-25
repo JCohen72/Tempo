@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @EnvironmentObject private var authManager: SpotifyAuthManager
+    @EnvironmentObject private var authManager: AuthManager
     @EnvironmentObject private var appState: AppState
     
     var body: some View {
@@ -18,12 +18,13 @@ struct MainView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding()
+            
             Button("Logout") {
                 authManager.logout()
-                appState.popToRoot()
-                
+                // appState.popToRoot()
             }
             .buttonStyle(.borderedProminent)
+            
             Spacer()
         }
         .navigationBarBackButtonHidden(true)
