@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-enum AppStep: Hashable {
+enum AppStep: String {
+    case login
     case questionnaireOne
     case questionnaireTwo
     case main

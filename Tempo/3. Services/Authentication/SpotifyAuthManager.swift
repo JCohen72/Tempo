@@ -5,13 +5,6 @@
 //  Created by Joey Cohen on 12/21/24.
 //
 
-//
-//  SpotifyAuthManager.swift
-//  Tempo
-//
-//  Created by Joey Cohen on 12/21/24.
-//
-
 import SwiftUI
 import CryptoKit
 import FirebaseAuth
@@ -162,7 +155,7 @@ final class SpotifyAuthManager {
     // MARK: - (Refactored) Logout from Spotify ONLY
     /**
      Logs out from Spotify ONLY, removing tokens from Keychain.
-     Returns `true` if no errors occurred (or tokens not found),
+     Returns true if no errors occurred (or tokens not found),
      otherwise false.
      */
     @discardableResult

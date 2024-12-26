@@ -33,7 +33,7 @@ struct QuestionnaireTwoView: View {
                 Spacer()
                 
                 Button("Done") {
-                    finishOnboarding()
+                    appState.finishOnboarding()
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -41,9 +41,5 @@ struct QuestionnaireTwoView: View {
         }
         .padding()
         .navigationBarBackButtonHidden(true)
-    }
-    
-    private func finishOnboarding() {
-        appState.push(.main)
     }
 }

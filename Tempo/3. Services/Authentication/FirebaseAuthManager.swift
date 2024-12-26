@@ -1,4 +1,11 @@
 //
+//  FirebaseAuthManager.swift
+//  Tempo
+//
+//  Created by Joey Cohen on 12/23/24.
+//
+
+//
 //  FIrebaseAuthManager.swift
 //  Tempo
 //
@@ -18,8 +25,8 @@ final class FirebaseAuthManager: ObservableObject {
     
     /**
      Attempts Firebase sign-in with the provided Spotify access token.
-     Returns `true` if successful, `false` otherwise.
-     All alerts are shown via `alertManager`.
+     Returns true if successful, false otherwise.
+     All alerts are shown via alertManager.
      */
     @MainActor
     func signInWithSpotify(
@@ -84,8 +91,8 @@ final class FirebaseAuthManager: ObservableObject {
     }
     
     /**
-     Logs out of Firebase, returning `true` if no errors occurred.
-     Otherwise false, with an alert displayed via `alertManager`.
+     Logs out of Firebase, returning true if no errors occurred.
+     Otherwise false, with an alert displayed via alertManager.
      */
     @discardableResult
     func signOutOfFirebase(alertManager: AlertManager) -> Bool {

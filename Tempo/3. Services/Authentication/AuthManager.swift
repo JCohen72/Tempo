@@ -10,8 +10,8 @@ import Combine
 
 /**
  A single manager that coordinates authentication steps using:
- - `SpotifyAuthManager` for the PKCE flow + storing tokens
- - `FirebaseAuthManager` for converting the Spotify token into a Firebase sign-in
+ - SpotifyAuthManager for the PKCE flow + storing tokens
+ - FirebaseAuthManager for converting the Spotify token into a Firebase sign-in
 
  Ensures both services remain in sync:
  - If Spotify login fails, we revert any partial Firebase login
@@ -51,6 +51,10 @@ final class AuthManager: ObservableObject {
      */
     func makeAuthorizationURL() -> URL? {
         return spotifyAuthManager.makeAuthorizationURL()
+    }
+    
+    public func currentUserUID() -> String? {
+        return firebaseAuthManager.currentFirebaseUID()
     }
     
     /**
@@ -159,7 +163,7 @@ final class AuthManager: ObservableObject {
     
     /**
      Logs out Spotify only. Used to roll back partial logins if Firebase fails.
-     Returns `true` if no errors happened, else `false`.
+     Returns true if no errors happened, else false.
      */
     @discardableResult
     private func logoutSpotifyOnly() -> Bool {

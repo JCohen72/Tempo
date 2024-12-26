@@ -10,7 +10,7 @@ import AuthenticationServices
 
 /// This file contains only the view (UI) code. All
 /// logic to start or handle Spotify auth is delegated
-/// to `LoginViewLogic`.
+/// to LoginViewLogic.
 struct LoginView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var authManager: AuthManager

@@ -14,9 +14,12 @@ struct AppFlowCoordinator: View {
     
     var body: some View {
         NavigationStack(path: $appState.navigationPath) {
-            LoginView()
+            // Initial content: LaunchView
+            RootView()
                 .navigationDestination(for: AppStep.self) { step in
                     switch step {
+                    case .login:
+                        LoginView()
                     case .questionnaireOne:
                         QuestionnaireOneView()
                     case .questionnaireTwo:
@@ -25,36 +28,49 @@ struct AppFlowCoordinator: View {
                         MainView()
                     }
                 }
-                .task {
-                    // If we have partial tokens, attempt to refresh
-                    let hasValidToken = await authManager.refreshIfNeeded()
-                    if hasValidToken {
-                        // If after refresh, both Spotify + Firebase are valid:
-                        if authManager.isLoggedIn {
-                            appState.push(.questionnaireOne)
-                        }
-                    } else {
-                        // If refresh not valid or fails, ensure root
-                        appState.popToRoot()
-                    }
-                }
-                // Observe changes in isLoggedIn to handle re-routes
+                // Whenever user logs in/out, we handle changes
                 .onChange(of: authManager.isLoggedIn) {
-                    if authManager.isLoggedIn {
-                        // Both services are now logged in => push to Q1
-                        appState.push(.questionnaireOne)
-                    } else {
-                        // They got logged out => ensure we’re at root
-                        appState.popToRoot()
-                    }
+                    Task { await route(shouldRefresh: false) }
                 }
         }
+        // Show alerts from alertManager
         .alert(item: $alertManager.alertMessage) { alertData in
             Alert(
                 title: Text(alertData.title),
                 message: Text(alertData.message),
                 dismissButton: .default(Text("OK"))
             )
+        }
+    }
+}
+
+// MARK: - Routing Helpers
+extension AppFlowCoordinator {
+    /**
+     Called whenever `isLoggedIn` changes mid-session (e.g. user logs out).
+     Decide if we pop to .login or remain in the current step.
+     */
+    private func route(shouldRefresh: Bool) async {
+        // If refresh is requested:
+        if shouldRefresh {
+            let validToken = await authManager.refreshIfNeeded()
+            if validToken && authManager.isLoggedIn {
+                // optional Firestore sync
+                await appState.syncFromFirebase(alertManager: alertManager)
+            }
+        }
+        
+        if authManager.isLoggedIn {
+            // If user is newly logged in, maybe skip to .main or current step
+            if appState.completedOnboarding {
+                appState.push(.main)
+            } else {
+                appState.push(appState.currentStep)
+            }
+        } else {
+            // If user logs out, pop to root + push .login
+            appState.popToRoot()
+            appState.push(.login)
         }
     }
 }
