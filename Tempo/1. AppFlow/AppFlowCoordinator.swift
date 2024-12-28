@@ -28,9 +28,9 @@ struct AppFlowCoordinator: View {
                         MainView()
                     }
                 }
-                // Whenever user logs in/out, we handle changes
+                // Handle mid-session login/logout changes
                 .onChange(of: authManager.isLoggedIn) {
-                    Task { await route(shouldRefresh: false) }
+                    Task { await handleAuthChange(shouldRefresh: false) }
                 }
         }
         // Show alerts from alertManager
@@ -44,24 +44,22 @@ struct AppFlowCoordinator: View {
     }
 }
 
-// MARK: - Routing Helpers
+// MARK: - Routing on Login/Logout Change
 extension AppFlowCoordinator {
     /**
-     Called whenever `isLoggedIn` changes mid-session (e.g. user logs out).
-     Decide if we pop to .login or remain in the current step.
+     Called whenever `isLoggedIn` changes mid-session, e.g. user logs out or logs in again.
+     - Parameter shouldRefresh: If true, attempt to refresh tokens (optional).
      */
-    private func route(shouldRefresh: Bool) async {
-        // If refresh is requested:
+    private func handleAuthChange(shouldRefresh: Bool) async {
         if shouldRefresh {
             let validToken = await authManager.refreshIfNeeded()
             if validToken && authManager.isLoggedIn {
-                // optional Firestore sync
-                await appState.syncFromFirebase(alertManager: alertManager)
+                await appState.syncFromFirebase(alertManager: alertManager, overrideLocal: false)
             }
         }
         
         if authManager.isLoggedIn {
-            // If user is newly logged in, maybe skip to .main or current step
+            // If user is already logged in, resume from local step or main
             if appState.completedOnboarding {
                 appState.push(.main)
             } else {

@@ -11,6 +11,13 @@ import SwiftUI
  A blank (or minimal spinner) view shown on app launch.
  It decides if the user should see the LoginView or skip ahead
  (Q1, Q2, main) based on local + token refresh checks.
+ 
+ Requirements Satisfied Here:
+ 0) Load blank view first so there's no flicker.
+ 1) If user never logged in or is logged out => .login
+ 2) If user was last in Q1/Q2/Main => restore to that step
+ 3) Local is priority. If local is missing but user is logged in, fetch from Firestore once.
+    If remote also missing => .login
  */
 struct RootView: View {
     @EnvironmentObject private var appState: AppState
@@ -20,40 +27,75 @@ struct RootView: View {
     var body: some View {
         ZStack {
             Color.clear.edgesIgnoringSafeArea(.all)
-            ProgressView("Loading...")
+            ProgressView()
                 .progressViewStyle(.circular)
+                .scaleEffect(1.5)
         }
         .task {
-            await route(shouldRefresh: true)
+            await handleInitialLaunch()
         }
     }
 }
 
-// MARK: - Private Helpers
 extension RootView {
-    /**
-     Attempts to refresh tokens; if user is valid => maybe sync Firestore,
-     then decide if we push .login or the last step.
-     */
-    private func route(shouldRefresh: Bool) async {
-        if shouldRefresh {
-            let validToken = await authManager.refreshIfNeeded()
-            if validToken && authManager.isLoggedIn {
-                // Optional: try to fetch remote data
-                await appState.syncFromFirebase(alertManager: alertManager)
+    private func handleInitialLaunch() async {
+        // 1) Attempt token refresh
+        let validToken = await authManager.refreshIfNeeded()
+
+        // 2) Check if user is logged in
+        guard validToken, authManager.isLoggedIn else {
+            // No animation for the initial push to .login
+            withTransaction(Transaction(animation: nil)) {
+                appState.popToRoot()
+                appState.push(.login)
             }
+            return
         }
         
-        // If never logged in or is logged out => show login
-        if !authManager.isLoggedIn {
-            appState.push(.login)
-        } else {
-            // Otherwise resume from local state
-            if appState.completedOnboarding {
-                appState.push(.main)
-            } else {
-                appState.push(appState.currentStep) // Q1 or Q2
+        // 3) If user is logged in => check if local data is missing
+        if appState.isLocalDataMissing {
+            do {
+                let foundRemote = try await appState.syncFromFirebaseBlockingIfNeeded(
+                    alertManager: alertManager
+                )
+                if foundRemote {
+                    // No animation for the first push from root
+                    withTransaction(Transaction(animation: nil)) {
+                        routeFromAppState()
+                    }
+                } else {
+                    withTransaction(Transaction(animation: nil)) {
+                        appState.popToRoot()
+                        appState.push(.login)
+                    }
+                }
+            } catch {
+                alertManager.showAlert(
+                    title: "Fetch Error",
+                    message: "Could not load remote state: \(error.localizedDescription)"
+                )
+                withTransaction(Transaction(animation: nil)) {
+                    appState.popToRoot()
+                    appState.push(.login)
+                }
             }
+        } else {
+            // Local data is present => push immediately, no flicker
+            withTransaction(Transaction(animation: nil)) {
+                routeFromAppState()
+            }
+            // Then do a background Firestore sync if desired
+            Task {
+                await appState.syncFromFirebase(alertManager: alertManager, overrideLocal: false)
+            }
+        }
+    }
+    
+    private func routeFromAppState() {
+        if appState.completedOnboarding {
+            appState.push(.main)
+        } else {
+            appState.push(appState.currentStep)
         }
     }
 }
