@@ -56,8 +56,7 @@ The following screenshots and diagrams illustrate key aspects of Tempo's UI and 
 Tempo is actively being developed.
 
 ## License
-© 2025 Joseph E. Cohen. All rights reserved.
-No part of this software—including its source code, design, or documentation—may be reproduced, distributed, or transmitted in any form or by any means, without prior written permission from the copyright holder.
+This project is proprietary. All rights are reserved. No part of this software—including its source code, design, or documentation—may be reproduced or distributed without prior written permission from the copyright holder. For complete details on the licensing terms, please refer to the LICENSE file in the root directory.
 
 ## Acknowledgements
 
