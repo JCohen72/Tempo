@@ -34,26 +34,10 @@ The app is organized into three main tabs:
 ## Images
 
 The following screenshots and diagrams illustrate key aspects of Tempo's UI and architecture.
-<img width="1385" alt="Screenshot 2025-02-11 at 12 23 12 PM" src="https://github.com/user-attachments/assets/72c50ca7-4629-4dff-ae7e-f4edd9848842" />
-<img width="1094" alt="Screenshot 2025-02-11 at 12 23 28 PM" src="https://github.com/user-attachments/assets/4f4f955c-82eb-46b2-b57d-b15ead9a6392" />
-<img width="1438" alt="Screenshot 2025-02-11 at 12 23 44 PM" src="https://github.com/user-attachments/assets/7de8f22e-3cf0-4cf7-9c24-6c185fa70d0f" />
-<img width="1438" alt="Screenshot 2025-02-11 at 12 23 51 PM" src="https://github.com/user-attachments/assets/4fce3fcf-b7f6-432b-8e9b-3f5379a9e497" />
-
-- **Login & Onboarding:**  
-  ![Login Screen](Images/login-screen.png)  
-  A user logs in with their Spotify account to start their journey.
-
-- **Personal Tab (Music Discovery):**  
-  ![Personal Tab](Images/personal-tab.png)  
-  Enter a music prompt and receive a curated list of tracks.
-
-- **Community Tab (Compatibility Web):**  
-  ![Community Tab](Images/community-tab.png)  
-  Visualize musical compatibility scores with friends.
-
-- **Profile Tab (Listening Insights):**  
-  ![Profile Tab](Images/profile-tab.png)  
-  Detailed analytics including top songs, genres, and playlists.
+<img width="1438" alt="Screenshot 2025-02-11 at 12 25 46 PM" src="https://github.com/user-attachments/assets/67d53339-cd3e-4102-bd6d-29eacbfe5219" />
+<img width="1438" alt="Screenshot 2025-02-11 at 12 26 06 PM" src="https://github.com/user-attachments/assets/5c08188f-ddb5-4aee-a7d2-618988c79c7f" />
+<img width="1438" alt="Screenshot 2025-02-11 at 12 26 12 PM" src="https://github.com/user-attachments/assets/24417f23-955a-4572-a018-d0b86ae139e2" />
+<img width="1438" alt="Screenshot 2025-02-11 at 12 26 16 PM" src="https://github.com/user-attachments/assets/7439a6c1-602c-4da6-8e0a-e2cb63ef8139" />
   
 ## Current Status
 
