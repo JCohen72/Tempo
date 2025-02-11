@@ -7,7 +7,7 @@ Tempo is an iOS music social media and listening application built with SwiftUI.
 Tempo integrates the vast Spotify music library with advanced AI via OpenAI’s GPT to offer tailored music recommendations based on natural language prompts. With seamless social connectivity, the app lets users visualize musical compatibility with friends, track their listening habits, and control playback across devices (including Bluetooth speakers) with minimal latency.
 
 The app is organized into three main tabs:
-- **Personal:** Discover personalized music recommendations by entering prompts (e.g., “chill acoustic vibes”).
+- **Listen:** Discover personalized music recommendations by entering prompts (e.g., “chill acoustic vibes”).
 - **Community:** Visualize your musical compatibility with friends via an interactive Compatibility Web.
 - **Profile:** Review your personal detailed listening insights—including top songs, playlists, genres, artists and trends/statistics.
 
@@ -39,7 +39,7 @@ The following screenshots and diagrams illustrate key aspects of Tempo's UI and 
 <img width="1438" alt="Screenshot 2025-02-11 at 12 27 46 PM" src="https://github.com/user-attachments/assets/6781f715-9313-44f5-a105-5ebab7406655" />
 
 
-**Personal Tab (Music Discovery):** Enter a music prompt and receive a curated list of tracks.
+**Listen Tab (Music Discovery):** Enter a music prompt and receive a curated list of tracks.
 <img width="1438" alt="Screenshot 2025-02-11 at 12 28 00 PM" src="https://github.com/user-attachments/assets/7f344869-bf05-4280-81c4-08dbfeb57d73" />
 
 
