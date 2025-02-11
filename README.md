@@ -35,7 +35,7 @@ The app is organized into three main tabs:
 
 The following screenshots and diagrams illustrate key aspects of Tempo's UI and architecture.
 <img width="1438" alt="Screenshot 2025-02-11 at 12 25 46 PM" src="https://github.com/user-attachments/assets/67d53339-cd3e-4102-bd6d-29eacbfe5219" />
-<img width="1438" alt="Screenshot 2025-02-11 at 12 26 06 PM" src="https://github.com/user-attachments/assets/5c08188f-ddb5-4aee-a7d2-618988c79c7f" />
+<img width="1438" alt="Screenshot 2025-02-11 at 12 27 46 PM" src="https://github.com/user-attachments/assets/dc70720e-9cb7-484f-9ccb-5b4d1d6890bc" />
 <img width="1438" alt="Screenshot 2025-02-11 at 12 26 12 PM" src="https://github.com/user-attachments/assets/24417f23-955a-4572-a018-d0b86ae139e2" />
 <img width="1438" alt="Screenshot 2025-02-11 at 12 26 16 PM" src="https://github.com/user-attachments/assets/7439a6c1-602c-4da6-8e0a-e2cb63ef8139" />
   
