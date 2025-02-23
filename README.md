@@ -35,7 +35,7 @@ The app is organized into three main tabs:
 
 The following screenshots and diagrams illustrate key aspects of Tempo's UI and architecture.
 
-**Login & Onboarding:** A user logs in with their Spotify account to start the journey.
+**Login & Onboarding:** A user logs in with their Spotify account to start the onboarding process.
 <img width="1438" alt="Screenshot 2025-02-11 at 12 27 46 PM" src="https://github.com/user-attachments/assets/6781f715-9313-44f5-a105-5ebab7406655" />
 
 
