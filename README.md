@@ -1,7 +1,5 @@
 # Tempo
 
-Tempo is an iOS music social media and listening application built with SwiftUI. Designed for production and optimized for the Apple App Store, Tempo elevates music discovery, social interaction, and personalized listening insights in an elegant and efficient interface.
-
 ## Overview
 
 Tempo is a free music-sharing application for iOS. Anyone can log into their music platform (Spotify, Apple Music, SoundCloud, YouTube Music, etc.) to showcase and *use* their music library. The app takes two avenues: social media and AI listening. The social media aspect is just like any other. Users have personalized profiles that display statistics of their listening habits such as genre breakdown and listening history, along with their top songs, artists, and playlists. They can follow friends or find someone new to learn about their listening habits or check their compatibility using the compatibility score. Next is AI listening. Simply describe what you want to listen to: “I want something similar in vibe to Mt. Joy,” “Give me only John Mayer and the Grateful Dead,” or even “I’m driving to Maine to go snowboarding.” Natural language processing takes your prompt and curates a tailored, infinite queue of music that perfectly matches your request, played directly on Tempo. The music will either be from your music library, the people you follow, or a mixture of the two depending on your preferences. 
