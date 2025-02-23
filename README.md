@@ -4,7 +4,7 @@ Tempo is an iOS music social media and listening application built with SwiftUI.
 
 ## Overview
 
-Tempo integrates the vast Spotify music library with advanced AI via OpenAI’s GPT to offer tailored music recommendations based on natural language prompts. With seamless social connectivity, the app lets users visualize musical compatibility with friends, track their listening habits, and control playback across devices (including Bluetooth speakers) with minimal latency.
+Tempo is a free music-sharing application for iOS. Anyone can log into their music platform (Spotify, Apple Music, SoundCloud, YouTube Music, etc.) to showcase and *use* their music library. The app takes two avenues: social media and AI listening. The social media aspect is just like any other. Users have personalized profiles that display statistics of their listening habits such as genre breakdown and listening history, along with their top songs, artists, and playlists. They can follow friends or find someone new to learn about their listening habits or check their compatibility using the compatibility score. Next is AI listening. Simply describe what you want to listen to: “I want something similar in vibe to Mt. Joy,” “Give me only John Mayer and the Grateful Dead,” or even “I’m driving to Maine to go snowboarding.” NLP takes your prompt and curates a tailored, infinite queue of music that perfectly matches your request, played directly on Tempo. The music will either be from your music library, the people you follow, or a mixture of the two depending on your preferences. 
 
 The app is organized into three main tabs:
 - **Listen:** Discover personalized music recommendations by entering prompts (e.g., “chill acoustic vibes”).
@@ -39,15 +39,15 @@ The following screenshots and diagrams illustrate key aspects of Tempo's UI and 
 <img width="1438" alt="Screenshot 2025-02-11 at 12 27 46 PM" src="https://github.com/user-attachments/assets/6781f715-9313-44f5-a105-5ebab7406655" />
 
 
-**Listen Tab (Music Discovery):** Enter a music prompt and receive a curated list of tracks.
+**Listen Tab (Music Discovery):** Enter a music prompt for a curated playlist tailored to your unique taste—or even influenced by the people you follow.
 <img width="1438" alt="Screenshot 2025-02-11 at 12 28 00 PM" src="https://github.com/user-attachments/assets/7f344869-bf05-4280-81c4-08dbfeb57d73" />
 
 
-**Community Tab (Compatibility Web):** Visualize musical compatibility scores with friends.
+**Community Tab (Compatibility Web):** Visualize musical compatibility scores with friends and discover new ones.
 <img width="1438" alt="Screenshot 2025-02-11 at 12 26 12 PM" src="https://github.com/user-attachments/assets/24417f23-955a-4572-a018-d0b86ae139e2" />
 
 
-**Profile Tab (Listening Insights):** Detailed analytics including top songs, genres, artists, and playlists.
+**Profile Tab (Listening Insights):** Detailed listening analytics along with top songs, artists, and playlists.
 <img width="1438" alt="Screenshot 2025-02-11 at 12 26 16 PM" src="https://github.com/user-attachments/assets/7439a6c1-602c-4da6-8e0a-e2cb63ef8139" />
 
 
