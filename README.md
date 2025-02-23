@@ -26,7 +26,7 @@ The app is organized into three main tabs:
   Access comprehensive statistics (e.g., top 50 tracks, genre breakdown, weekly trends) in the Profile tab, offering users a deep dive into their musical journey.
 
 - **Seamless Playback:**  
-  Integration with Bluetooth speakers and on-device controls ensures playback synchronization with latency under 100 milliseconds.
+  Integration with Bluetooth speakers and on-device controls ensures playback synchronization with minimal latency.
 
 - **Real-Time Data & Persistence:**  
   Firebase Firestore is used to store and retrieve user data, ensuring data continuity across sessions.
